@@ -1,0 +1,1 @@
+# DB Controller for client side rendering
