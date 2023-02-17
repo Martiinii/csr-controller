@@ -1,0 +1,40 @@
+{
+    "name": "csr-controller",
+    "version": "1.0.0",
+    "description": "DB Controller for client side rendering",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "prepublishOnly" : "npm test && npm run lint",
+        "prepare" : "npm run build",
+        
+        "preversion" : "npm run lint",
+        "version" : "npm run format && git add -A src",
+        "postversion" : "git push && git push --tags",
+
+        "build": "tsc",
+        "test": "echo \"Error: no test specified\"",
+
+        "format": "prettier --write \"src/**/*.ts\"",
+        "lint": "tslint -p tsconfig.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Martiinii/csr-controller.git"
+    },
+    "keywords": ["controller", "client-side", "mvc"],
+    "author": "martiinii",
+    "license": "ISC",
+    "files": ["lib/**/*"],
+    "bugs": {
+        "url": "https://github.com/Martiinii/csr-controller/issues"
+    },
+    "homepage": "https://github.com/Martiinii/csr-controller#readme",
+    "devDependencies": {
+        "@types/node": "^18.13.0",
+        "prettier": "^2.8.4",
+        "tslint": "^6.1.3",
+        "tslint-config-prettier": "^1.18.0",
+        "typescript": "^4.9.5"
+    }
+}
