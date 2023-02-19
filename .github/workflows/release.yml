@@ -2,27 +2,55 @@ name: Release package
 on:
   workflow_dispatch:
     inputs:
-      release-type:
-        description: "Release type (one of): patch, minor, major, prepatch, preminor, premajor, prerelease"
+      release-level:
+        description: "Release level (one of): patch, minor, major, prepatch, preminor, premajor, prerelease"
         required: true
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      # Check if provided release level is valid
+      - name: Release level check
+        run: |
+          case "$RELEASE_LEVEL" in
+            major|minor|patch|premajor|preminor|prepatch|prerelease)
+              echo "Release-level is OK"
+              ;;
+            *)
+              echo "Unknown release-level"
+              exit 1
+              ;;
+          esac
+        env:
+          RELEASE_LEVEL: ${{ github.event.inputs.release-level }}
+
+      # Check if stable release is on main branch
+      - name: Branch check
+        run: |
+          if [[ $RELEASE_LEVEL != pre* ]] && [[ $BRANCH != main ]]
+          then
+            echo "Stable release on other then main branch is not allowed"
+            exit 1
+          fi
+          echo "Release-level and branch combination is VALID"
+        env:
+          BRANCH: ${{ github.ref_name }}
+          RELEASE_LEVEL: ${{ github.event.inputs.release-level }}
+
       # Checkout project repository
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       # Setup Node.js environment
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           registry-url: https://registry.npmjs.org/
           node-version: 18
 
       # Install dependencies (required by Run tests step)
       - name: Install dependencies
-        run: npm i
+        run: npm ci
 
       # Tests
       - name: Run tests
@@ -37,32 +65,41 @@ jobs:
       # Bump package version
       # Use tag latest
       - name: Bump release version
-        if: startsWith(github.event.inputs.release-type, 'pre') != true
+        if: startsWith(github.event.inputs.release-level, 'pre') != true
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_LEVEL)" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
         env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+          RELEASE_LEVEL: ${{ github.event.inputs.release-level }}
 
       # Bump package pre-release version
       # Use tag beta for pre-release versions
       - name: Bump pre-release version
-        if: startsWith(github.event.inputs.release-type, 'pre')
+        if: startsWith(github.event.inputs.release-level, 'pre') && github.ref_name != 'main'
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE
+          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_LEVEL)" >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
         env:
-          RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+          RELEASE_LEVEL: ${{ github.event.inputs.release-level }}
+
+      - name: Bump rc pre-release version
+        if: startsWith(github.event.inputs.release-level, 'pre') && github.ref_name == 'main'
+        run: |
+          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=rc version $RELEASE_LEVEL)" >> $GITHUB_ENV
+          echo "RELEASE_TAG=next" >> $GITHUB_ENV
+        env:
+          RELEASE_LEVEL: ${{ github.event.inputs.release-level }}
 
       # Update changelog unreleased section with new version
       - name: Update changelog
         uses: superfaceai/release-changelog-action@v1
+        if: startsWith(github.event.inputs.release-level, 'pre') != true
         with:
           path-to-changelog: CHANGELOG.md
           version: ${{ env.NEW_VERSION }}
           operation: release
 
-      # Commit changes
+      # Commit changelog changes
       - name: Commit CHANGELOG.md and package.json changes and create tag
         run: |
           git add "package.json"
@@ -72,7 +109,7 @@ jobs:
 
       # Publish version to public repository
       - name: Publish
-        run: yarn publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+        run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
 
@@ -85,19 +122,20 @@ jobs:
 
       # Read version changelog
       - id: get-changelog
-        name: Get version changelog
+        name: Get release version changelog
+        if: startsWith(github.event.inputs.release-level, 'pre') != true
         uses: superfaceai/release-changelog-action@v1
         with:
           path-to-changelog: CHANGELOG.md
           version: ${{ env.NEW_VERSION }}
           operation: read
 
-      # Update GitHub release with changelog
+      # Update release documentation
       - name: Update GitHub release documentation
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.NEW_VERSION }}
           body: ${{ steps.get-changelog.outputs.changelog }}
-          prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+          prerelease: ${{ startsWith(github.event.inputs.release-level, 'pre') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
