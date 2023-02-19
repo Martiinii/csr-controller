@@ -1,4 +1,4 @@
-import { createController } from './createController';
+import { createController, CRUDBase } from './createController';
 import { crudTemplate } from './templates/crudTemplate';
 
 import { fetcher } from './fetcher';
@@ -7,26 +7,31 @@ jest.mock('./fetcher');
 const mockedFetcher = jest.mocked(fetcher);
 
 beforeEach(() => {
-	mockedFetcher.mockClear();
+    mockedFetcher.mockClear();
 });
 
 describe('Controller module', () => {
-	const UserController = createController({
-		$url: 'user',
-	})(crudTemplate);
+    type User = {
+        name: string,
+        age: number
+    }
 
-	test('Check default values', () => {
-		expect(UserController.$url).toBe('user');
-		expect(UserController.$base).toBe('custom');
-		expect(UserController.$protected).toBe(true);
-	});
+    const UserController = createController<User, CRUDBase, CRUDBase>({
+        $url: 'user',
+    })(crudTemplate);
 
-	test('Check if fetcher has been called', () => {
-		UserController.index();
-		expect(fetcher).toHaveBeenLastCalledWith('user', 'GET');
+    test('Check default values', () => {
+        expect(UserController.$url).toBe('user');
+        expect(UserController.$base).toBe('custom');
+        expect(UserController.$protected).toBe(true);
+    });
 
-		UserController.read({ id: 15 });
-		expect(fetcher).toHaveBeenLastCalledWith('user', 'GET', { id: 15 });
-		expect(fetcher).toHaveBeenCalledTimes(2);
-	});
+    test('Check if fetcher has been called', () => {
+        UserController.index();
+        expect(fetcher).toHaveBeenLastCalledWith('user', 'GET');
+
+        UserController.read({ id: 15 });
+        expect(fetcher).toHaveBeenLastCalledWith('user', 'GET', { id: 15 });
+        expect(fetcher).toHaveBeenCalledTimes(2);
+    });
 });

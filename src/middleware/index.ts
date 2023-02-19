@@ -4,3 +4,5 @@ import { Controller } from '../controller/createController';
 export type ControllerMiddleware = (
 	c: Controller<any, any, any>
 ) => APIFullErrorResponse | undefined | Promise<APIFullErrorResponse | undefined>;
+
+export * from './protectedMiddleware';
