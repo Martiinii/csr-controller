@@ -3,13 +3,14 @@ import { Controller } from '../../controller/createController';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { APIErrorResponse, APIFullErrorResponse, controllerNotFound, unimplementedMethodResponse } from '../response';
 import { getHandler } from '../handler';
+import { ControllerMiddleware } from '../../middleware';
 
 /**
  * Default Next API route to use with controllers
  *
  * @param args Routes made with controllerRegistry
  */
-export const withNextRoute = (args: Map<string, Controller<any, any, any>>) => {
+export const withNextRoute = (args: Map<string, Controller<any, any, any>>, ...middlewares: ControllerMiddleware[]) => {
 	return async (req: NextApiRequest, res: NextApiResponse) => {
 		const method = req.method.toUpperCase();
 		const nextcontroller = req.query.nextcontroller as string[];
@@ -28,7 +29,14 @@ export const withNextRoute = (args: Map<string, Controller<any, any, any>>) => {
 			return apiErrorResponse(req, res, unimplementedMethodResponse);
 		}
 
-		// TODO middleware such as user authentication, permission checking
+		// Run every middleware in sequence. If any fails, return error response
+		for (const middleware of middlewares) {
+			const middlewareResponse = await middleware(controller);
+
+			if (middlewareResponse != null) {
+				return apiErrorResponse(req, res, middlewareResponse);
+			}
+		}
 
 		const result = await handler(req.body);
 		res.status(200).json(result);
