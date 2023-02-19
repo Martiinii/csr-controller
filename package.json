@@ -24,7 +24,7 @@
   "author": "martiinii",
   "license": "ISC",
   "files": [
-    "lib/**/*"
+    "dist/**/*"
   ],
   "bugs": {
     "url": "https://github.com/Martiinii/csr-controller/issues"
