@@ -1,57 +1,50 @@
 {
-  "name": "csr-controller",
-  "version": "1.2.2",
-  "description": "DB Controller for client side rendering",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": "./dist/",
-    "./apiRoutes": "./dist/apiRoutes/index.js",
-    "./middleware": "./dist/middleware/index.js",
-    "./registry": "./dist/registry/index.js",
-    "./template": "./dist/template/index.js",
-    "./utils": "./dist/utils/index.js"
-  },
-  "scripts": {
-    "prepack": "npm run build",
-    "prepush": "npm run build && npm test && npm run lint && npm run format",
-    "build": "tsc",
-    "test": "jest --config jest.config.ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Martiinii/csr-controller.git"
-  },
-  "keywords": [
-    "controller",
-    "client-side",
-    "mvc"
-  ],
-  "author": "martiinii",
-  "license": "ISC",
-  "files": [
-    "dist/**/*"
-  ],
-  "bugs": {
-    "url": "https://github.com/Martiinii/csr-controller/issues"
-  },
-  "homepage": "https://github.com/Martiinii/csr-controller#readme",
-  "devDependencies": {
-    "@types/jest": "^29.4.0",
-    "@types/node": "^18.13.0",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "jest": "^29.4.3",
-    "next": "^13.1.6",
-    "prettier": "^2.8.4",
-    "ts-jest": "^29.0.5",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^4.9.5"
-  },
-  "dependencies": {
-    "ts-node": "^10.9.1"
-  }
+    "name": "csr-controller",
+    "version": "1.2.2",
+    "description": "DB Controller for client side rendering",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": "./dist/",
+    "scripts": {
+        "prepack": "npm run build",
+        "prepush": "npm run build && npm test && npm run lint && npm run format",
+        "build": "tsc",
+        "test": "jest --config jest.config.ts",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "lint": "tslint -p tsconfig.json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Martiinii/csr-controller.git"
+    },
+    "keywords": [
+        "controller",
+        "client-side",
+        "mvc"
+    ],
+    "author": "martiinii",
+    "license": "ISC",
+    "files": [
+        "dist/**/*"
+    ],
+    "bugs": {
+        "url": "https://github.com/Martiinii/csr-controller/issues"
+    },
+    "homepage": "https://github.com/Martiinii/csr-controller#readme",
+    "devDependencies": {
+        "@types/jest": "^29.4.0",
+        "@types/node": "^18.13.0",
+        "@types/react": "^18.0.28",
+        "@types/react-dom": "^18.0.11",
+        "jest": "^29.4.3",
+        "next": "^13.1.6",
+        "prettier": "^2.8.4",
+        "ts-jest": "^29.0.5",
+        "tslint": "^6.1.3",
+        "tslint-config-prettier": "^1.18.0",
+        "typescript": "^4.9.5"
+    },
+    "dependencies": {
+        "ts-node": "^10.9.1"
+    }
 }
