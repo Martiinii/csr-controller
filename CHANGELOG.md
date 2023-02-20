@@ -13,10 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.1] - 2023-02-19
 ### Added
-- Readme
+- Readme file
 
 ### Fixed
-- Fixed file declarations
+- File declarations for entire project
 
 ## [1.2.0] - 2023-02-19
 ### Added
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Protected middleware
 
 ### Fixed
-- Fixed changelog versions
+- Changelog versions
 
 ## [1.1.0] - 2023-02-19
 ### Added

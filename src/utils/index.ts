@@ -1,4 +1,4 @@
-import { CRUDFetchMethod } from './createController';
+import { CRUDFetchMethod } from '../';
 
 /**
  * Simple fetcher

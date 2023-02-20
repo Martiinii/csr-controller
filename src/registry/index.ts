@@ -1,4 +1,4 @@
-import { CRUDBase, Controller, ControllerBase } from './createController';
+import { Controller, ControllerBase, CRUDBase } from '../';
 
 type ControllerRegistryProps<T, C extends CRUDBase, U extends CRUDBase> = Partial<
 	Omit<Controller<T, C, U>, keyof ControllerBase>

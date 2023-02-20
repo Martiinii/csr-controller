@@ -1,8 +1,9 @@
-import { createController, CRUDBase } from './createController';
-import { crudTemplate } from './templates/crudTemplate';
+import { createController, CRUDBase } from './';
+import { crudTemplate } from './template/';
 
-import { fetcher } from './fetcher';
-jest.mock('./fetcher');
+import { fetcher } from './utils';
+
+jest.mock('./utils');
 
 const mockedFetcher = jest.mocked(fetcher);
 

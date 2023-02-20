@@ -1,5 +1,4 @@
-import { CRUDBase, ControllerBase, ControllerMethods } from '../createController';
-
+import { CRUDBase, ControllerBase, ControllerMethods } from '..';
 type CreateTemplateData<T, C extends CRUDBase, U extends CRUDBase> = ControllerMethods<T, C, U>;
 
 /**
@@ -13,3 +12,5 @@ export const createTemplate = <D extends CreateTemplateData<any, any, any>>(data
 		c: ControllerBase
 	) => CreateTemplateData<T, C, U> & Omit<D, keyof CreateTemplateData<T, C, U>>;
 };
+
+export * from './crudTemplate';

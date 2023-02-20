@@ -4,6 +4,14 @@
   "description": "DB Controller for client side rendering",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/",
+    "./apiRoutes": "./dist/apiRoutes/index.js",
+    "./middleware": "./dist/middleware/index.js",
+    "./registry": "./dist/registry/index.js",
+    "./template": "./dist/template/index.js",
+    "./utils": "./dist/utils/index.js"
+  },
   "scripts": {
     "prepack": "npm run build",
     "prepush": "npm run build && npm test && npm run lint && npm run format",

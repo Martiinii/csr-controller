@@ -1,4 +1,4 @@
-import { CRUDBase, CRUDFetchMethod, Controller } from '../controller/createController';
+import { CRUDBase, CRUDFetchMethod, Controller } from '../';
 /**
  * Gets handler method from controller based on provided controller and data
  *
