@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
-        "target": "ES5",
+        "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "node",
+        "isolatedModules": true,
         "declaration": true,
         "outDir": "dist",
         "allowSyntheticDefaultImports": true
