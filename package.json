@@ -23,7 +23,9 @@
         "test": "jest --config jest.config.ts",
         "format": "prettier --write \"src/**/*.ts\"",
         "lint": "eslint -c .eslintrc.js --ext .ts src",
-        "devRelease": "cd dist && npm pack"
+        "devRelease": "cd dist && npm pack",
+
+        "prepublishOnly": "npm run prepush && cd dist"
     },
     "repository": {
         "type": "git",
