@@ -24,9 +24,11 @@ export const getHandler = <T, C extends CRUDBase, U extends CRUDBase>(
 		}
 		case 'PATCH': {
 			if (nextcontroller.at(1)) return c.update;
+			break;
 		}
 		case 'DELETE': {
 			if (nextcontroller.at(1)) return c.destroy;
+			break;
 		}
 		default: {
 			return null;
