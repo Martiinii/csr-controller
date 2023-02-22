@@ -27,9 +27,9 @@ jobs:
       # Check if stable release is on main branch
       - name: Branch check
         run: |
-          if [[ $RELEASE_LEVEL != pre* ]] && [[ $BRANCH != main ]]
+          if [[ $RELEASE_LEVEL != pre* ]] && [[ $BRANCH != release ]]
           then
-            echo "Stable release on other then main branch is not allowed"
+            echo "Stable release on other than release branch is not allowed"
             exit 1
           fi
           echo "Release-level and branch combination is VALID"
