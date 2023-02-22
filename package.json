@@ -2,16 +2,28 @@
     "name": "csr-controller",
     "version": "1.2.2",
     "description": "DB Controller for client side rendering",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "exports": "./dist/",
+    "main": "index.js",
+    "types": "index.d.ts",
+    "exports": {
+        ".": "./index.js",
+        "./apiRoutes/*": "./apiRoutes/*/index.js",
+        "./middleware": "./middleware/index.js",
+        "./registry": "./registry/index.js",
+        "./template": "./template/index.js",
+        "./utils": "./utils/index.js"
+    },
     "scripts": {
-        "prepack": "npm run build",
         "prepush": "npm run build && npm test && npm run lint && npm run format",
-        "build": "tsc",
+        "win-prepush": "npm run win-build && npm test && npm run lint && npm run format",
+        "bundle": "tsc",
+        "copy": "cp \"package.json\" dist && cp \"README.md\" dist && cp \".npmrc\" dist",
+        "win-copy": "copy \"package.json\" dist && copy \"README.md\" dist && copy \".npmrc\" dist",
+        "build": "npm run bundle && npm run copy",
+        "win-build": "npm run bundle && npm run win-copy",
         "test": "jest --config jest.config.ts",
         "format": "prettier --write \"src/**/*.ts\"",
-        "lint": "tslint -p tsconfig.json"
+        "lint": "eslint -c .eslintrc.js --ext .ts src",
+        "devRelease": "cd dist && npm pack"
     },
     "repository": {
         "type": "git",
@@ -24,9 +36,6 @@
     ],
     "author": "martiinii",
     "license": "ISC",
-    "files": [
-        "dist/**/*"
-    ],
     "bugs": {
         "url": "https://github.com/Martiinii/csr-controller/issues"
     },
@@ -36,6 +45,14 @@
         "@types/node": "^18.13.0",
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.11",
+        "@typescript-eslint/eslint-plugin": "^5.53.0",
+        "@typescript-eslint/parser": "^5.53.0",
+        "eslint": "^8.34.0",
+        "eslint-config-prettier": "^8.6.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-jsdoc": "^40.0.0",
+        "eslint-plugin-prefer-arrow": "^1.2.3",
+        "eslint-plugin-react": "^7.32.2",
         "jest": "^29.4.3",
         "next": "^13.1.6",
         "prettier": "^2.8.4",
