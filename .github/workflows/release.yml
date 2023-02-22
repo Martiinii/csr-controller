@@ -115,7 +115,7 @@ jobs:
       - name: Publish
         run: |
           cd dist
-          npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+          npm publish --dry-run --verbose --access public --tag ${{ env.RELEASE_TAG }}
           cd ..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
