@@ -30,7 +30,7 @@ First, we can skip generics and just call `createController()`, but for type saf
 
 Calling the function, we must specify `$url` - it's the api path. We can also specify `$base`. It is default to `"custom"`.
 
-In our case, using `UserController` every action would fetch `relativeServerPath:port/custom/user`
+In our case, using `UserController` any action would fetch `relativeServerPath:port/api/custom/user`
 
 Next, we must provide template. Here we provide `crudTemplate`. It is preferred when using web server as it makes direct fetch calls to api and can be shared between projects. In the feature there will be `electronTemplate` that makes IPC calls.
 
@@ -50,4 +50,29 @@ const routes = controllerRegistry().register(UserController, {
 }).handle();
 ```
 
-We can use this routes with web servers
+#### Usage with popular frameworks
+
+##### Next.JS
+To use our routes with Next, create page in `api/[base]/[...nextcontroller]`. Remember, `base` defaults to `"custom"`.
+
+```ts
+import { withNextRoute } from "csr-controller/apiRoutes/next"
+import { controllerRegistry } from "csr-controller/registry"
+
+const routes = controllerRegistry().register(...).handle();
+
+export default withNextRoute(routes)
+```
+
+This API page will handle every request from registered controllers.
+
+### Client side rendering
+```ts
+// Get all users
+const users = await UserController.index();
+
+// Update user
+const updatedUser = await UserController.update({ id: 1, /* Pass rest data here */ })
+```
+
+It is recommended to use `useSWR` hook when developing with React based frameworks like Next.JS

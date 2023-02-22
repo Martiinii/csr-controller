@@ -107,9 +107,16 @@ jobs:
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
+      # Build package
+      - name: "Build"
+        run: npm run build
+
       # Publish version to public repository
       - name: Publish
-        run: npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+        run: |
+          cd dist
+          npm publish --verbose --access public --tag ${{ env.RELEASE_TAG }}
+          cd ..
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_ACCESS_TOKEN }}
 

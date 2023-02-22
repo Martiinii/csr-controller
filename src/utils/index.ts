@@ -11,7 +11,7 @@ import { CRUDFetchMethod } from '../';
 export const fetcher = <T>(
 	resource: string,
 	method: (typeof CRUDFetchMethod)[number],
-	data?: {} | string
+	data?: object | string
 ): Promise<T> => {
 	return fetch(typeof data === 'string' ? new URL(data, resource) : resource, {
 		method,

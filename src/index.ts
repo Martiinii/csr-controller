@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
+
 import { createTemplate } from './template';
 
 export const CRUDFetchMethod = ['GET', 'POST', 'PATCH', 'DELETE'] as const;
 export interface DefaultCRUDBase {
 	id: string | number;
 }
-/* tslint:disable:no-empty-interface */
 export interface CRUDBase extends DefaultCRUDBase {}
-/* tslint:enable:no-empty-interface */
 
 /**
  * @param $url Controller API route
@@ -18,10 +18,7 @@ export interface DefaultControllerBase {
 	$base?: string;
 	$protected?: boolean;
 }
-
-/* tslint:disable:no-empty-interface */
 export interface ControllerBase extends DefaultControllerBase {}
-/* tslint:enable:no-empty-interface */
 
 export type Controller<T, C extends CRUDBase, U extends CRUDBase> = {
 	create?: (data: C) => Promise<T>;

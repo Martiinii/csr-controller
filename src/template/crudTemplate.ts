@@ -1,5 +1,5 @@
 import { fetcher } from '../utils';
-import { createTemplate } from './';
+import { createTemplate } from './createTemplate';
 
 /**
  * Simple CRUD template that utilizes all methods

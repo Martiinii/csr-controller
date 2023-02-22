@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { APIErrorResponse, APIFullErrorResponse, controllerNotFound, unimplementedMethodResponse } from '../response';
 import { getHandler } from '../handler';
 import { ControllerMiddleware } from '../../middleware';
-import { Controller } from '../../';
+import { Controller } from '../..';
 
 /**
  * Default Next API route to use with controllers
