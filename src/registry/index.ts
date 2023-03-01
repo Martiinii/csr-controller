@@ -11,7 +11,7 @@ type PartialFunction<T extends (...args: unknown[]) => unknown> = PartialParamet
 	: never;
 
 /**
- * Allows to register every controller db handler
+ * Allows to register every controller database handler
  *
  * @returns Object with register and handle methods
  */
@@ -22,7 +22,7 @@ export const controllerRegistry = () => {
 	 * Register controller with database handlers
 	 *
 	 * @param c @see {@link Controller}
-	 * @param db Database handlers
+	 * @param db Database handlers for controller and sub controllers
 	 * @returns
 	 */
 	const register = <CONT extends Controller<unknown, CRUDBase, CRUDBase>>(

@@ -5,7 +5,7 @@ type CreateTemplateData<T, C extends CRUDBase, U extends CRUDBase> = Partial<Con
 /**
  * Creates template for controllers
  *
- * @param data Function with {@link ControllerBase} parameter that should return all controller methods
+ * @param data Function with {@link ControllerProps} parameter that should return all controller methods
  * @returns Template for controllers
  */
 export const createTemplate = <D extends CreateTemplateData<unknown, CRUDBase, CRUDBase>>(

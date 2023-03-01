@@ -14,6 +14,7 @@ import { Controller, CRUDBase } from '../..';
  * Default Next API route to use with controllers
  *
  * @param args Routes made with controllerRegistry
+ * @param middlewares Array of middlewares to execute (in order)
  */
 export const withNextRoute = (
 	args: Map<string, Controller<unknown, CRUDBase, CRUDBase>>,
@@ -29,7 +30,7 @@ export const withNextRoute = (
 
 		let controller = args.get(nextcontroller.at(0));
 
-		// If sub controller
+		// Use sub controller?
 		if (nextcontroller.at(2)) {
 			if (!controller[nextcontroller.at(2)])
 				return apiErrorResponse(req, res, subControllerNotFound(nextcontroller.at(2)));
