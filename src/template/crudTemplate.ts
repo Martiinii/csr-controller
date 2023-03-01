@@ -7,12 +7,12 @@ import { createTemplate } from './createTemplate';
  * @see {@link createTemplate}
  */
 export const crudTemplate = createTemplate(c => ({
-	create: data => fetcher(c.$url, 'POST', data),
+	create: data => fetcher(c, 'POST', data),
 
-	index: () => fetcher(c.$url, 'GET'),
-	read: data => fetcher(c.$url, 'GET', data),
+	index: () => fetcher(c, 'GET'),
+	read: data => fetcher(c, 'GET', data),
 
-	update: data => fetcher(c.$url, 'PATCH', data),
+	update: data => fetcher(c, 'PATCH', data),
 
-	destroy: data => fetcher(c.$url, 'DELETE', data),
+	destroy: data => fetcher(c, 'DELETE', data),
 }));

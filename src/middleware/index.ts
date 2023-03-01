@@ -1,6 +1,8 @@
 import { APIFullErrorResponse } from '../apiRoutes/response';
-import { Controller } from '../';
+import { Controller, CRUDBase } from '../';
 
 export type ControllerMiddleware = (
-	c: Controller<any, any, any>
+	c: Controller<unknown, CRUDBase, CRUDBase>
 ) => APIFullErrorResponse | undefined | Promise<APIFullErrorResponse | undefined>;
+
+export * from './debugMiddleware';

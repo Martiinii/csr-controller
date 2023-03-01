@@ -25,3 +25,5 @@ export const controllerNotFound = (path: string): APIFullErrorResponse => ({
 	status: 404,
 	error: `${path}Controller not found`,
 });
+
+export const subControllerNotFound = (path: string): APIFullErrorResponse => controllerNotFound(`${path}Sub`);
