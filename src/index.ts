@@ -96,13 +96,13 @@ export const createSubController = <T>(data: Omit<SharedControllerProps, '$paren
 		 * Function to provide parent controller props
 		 *
 		 * @param c ControllerProps
-		 * @returns Subcontroller
+		 * @returns Subcontrollerz
 		 */
 		return (c: ControllerProps) => {
 			const { $protected, $url: $parentUrl, $base } = c;
+
 			return {
-				$base,
-				$protected,
+				...c,
 				$parentUrl,
 				...data,
 
