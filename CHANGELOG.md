@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.2] - 2023-03-02
+### Fixed
+- Passing data down from controller to sub controllers
+
+## [1.4.1] - 2023-03-02
+### Added
+- Added req and res to middlewares
+
 ## [1.4.0] - 2023-03-01
 ### Added
 - Sub controllers
@@ -54,7 +62,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial commit
 
-[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.2...HEAD
+[1.4.2]: https://github.com/Martiinii/csr-controller/compare/v1.4.1...v1.4.2
+[1.4.1]: https://github.com/Martiinii/csr-controller/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Martiinii/csr-controller/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/Martiinii/csr-controller/compare/v1.2.2...v1.3.1
 [1.2.2]: https://github.com/Martiinii/csr-controller/compare/v1.2.1...v1.2.2

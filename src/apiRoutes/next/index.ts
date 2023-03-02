@@ -48,7 +48,7 @@ export const withNextRoute = (
 
 		// Run every middleware in sequence. If any fails, return error response
 		for (const middleware of middlewares) {
-			const middlewareResponse = await middleware(controller);
+			const middlewareResponse = await middleware(controller, req, res);
 
 			if (middlewareResponse != null) {
 				return apiErrorResponse(req, res, middlewareResponse);
