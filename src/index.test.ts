@@ -20,7 +20,14 @@ describe('Controller module', () => {
 	const UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
 	})(crudTemplate, {
-		statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+		subcontrollers: {
+            statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+        },
+        methods: {
+            testing: (t) => {
+                t.
+            }
+        }
 	});
 
 	describe('Check default values', () => {
