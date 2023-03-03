@@ -21,13 +21,11 @@ describe('Controller module', () => {
 		$url: 'users',
 	})(crudTemplate, {
 		subcontrollers: {
-            statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
-        },
-        methods: {
-            testing: (t) => {
-                t.
-            }
-        }
+			statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+		},
+		methods: {
+			testing: t => {},
+		},
 	});
 
 	describe('Check default values', () => {

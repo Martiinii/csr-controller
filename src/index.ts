@@ -42,7 +42,7 @@ export type ControllerMethods<T, C, U> = {
 export type Controller<T, C extends CRUDBase, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
 export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T> & SharedControllerProps;
 
-type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB> = Controller<T, C, U> & SUB;
+type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
 type SubControllerReturnType<T> = ReturnType<SubController<T>> & DefaultControllerProps;
 /**
  * Create controller
@@ -61,12 +61,19 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 	 * @param sc Array of subcontrollers
 	 * @returns Controller
 	 */
-	return <ST extends { [k: string]: SubController<unknown> }, K extends keyof ST>(
+
+	//  TODO need to give proper generic type to create template
+	return <
+		ST extends { [k: string]: SubController<unknown> },
+		M extends { [k: string]: (data: ReturnType<ReturnType<typeof createTemplate>>) => Promise<T> },
+		KS extends keyof ST,
+		KM extends keyof M
+	>(
 		template: ReturnType<typeof createTemplate>,
-		sc?: ST
+		config?: { subcontrollers?: ST; methods?: M }
 	) => {
-		const subs = Object.keys(sc).reduce<{ [k in K]: ReturnType<ST[k]> }>((p, c) => {
-			p[c] = sc[c](data);
+		const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: ReturnType<ST[k]> }>((p, c) => {
+			p[c] = config.subcontrollers[c](data);
 			return p;
 		}, {} as never);
 
@@ -74,7 +81,8 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 			...data,
 			...template<T, C, U>(data),
 			...subs,
-		} as ControllerReturnType<T, C, U, { [k in K]: ReturnType<ST[k]> }>;
+			...config.methods,
+		} as ControllerReturnType<T, C, U, { [k in KS]: ReturnType<ST[k]> }, { [k in KM]: M[k] }>;
 	};
 };
 
