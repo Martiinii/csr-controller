@@ -75,6 +75,11 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 			subcontrollers?: ST;
 			methods?: M;
 		}) => {
+			// Default values
+			config ??= {};
+			config.subcontrollers ??= {} as never;
+			config.methods ??= {} as never;
+
 			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: ReturnType<ST[k]> }>((p, c) => {
 				p[c] = config.subcontrollers[c](data);
 				return p;
