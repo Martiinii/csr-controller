@@ -95,7 +95,13 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 				...template(data),
 				...subs,
 				...mets,
-			} as ControllerReturnType<T, C, U, { [k in KS]: ReturnType<ST[k]> }, { [k in KM]: ReturnType<M[k]> }>;
+			} as ControllerReturnType<
+				T,
+				C,
+				U,
+				KS extends never ? object : { [k in KS]: ReturnType<ST[k]> },
+				KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
+			>;
 		};
 	};
 };
