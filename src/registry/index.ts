@@ -38,7 +38,7 @@ export const controllerRegistry = () => {
 				Omit<CONT, keyof ControllerMethods<unknown, CRUDBase, CRUDBase> | keyof ControllerProps>,
 				ReturnType<SubController<unknown>>
 			>]: {
-				[k in keyof CONT[sk] & keyof BaseControllerMethods<unknown>]: CONT[sk][k];
+				[k in keyof CONT[sk] & keyof BaseControllerMethods<unknown>]?: CONT[sk][k];
 			};
 		}
 	) => {

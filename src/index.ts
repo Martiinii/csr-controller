@@ -28,19 +28,19 @@ export interface SharedControllerProps extends DefaultSharedControllerProps {}
 export interface ControllerProps extends DefaultControllerProps {}
 
 // Methods
-export type BaseControllerMethods<T> = {
+export type BaseControllerMethods<T, ISARR = true> = {
+	index: () => Promise<ISARR extends true ? T[] : T>;
 	read: (data: CRUDBase) => Promise<T | Record<string, never>>;
 };
-export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase> = {
+export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase, ISARR = true> = {
 	create: (data: C) => Promise<T | Record<string, never>>;
-	index: () => Promise<T[]>;
 	update: (data: U) => Promise<T | Record<string, never>>;
 	destroy: (data: CRUDBase) => Promise<T | Record<string, never>>;
-} & BaseControllerMethods<T>;
+} & BaseControllerMethods<T, ISARR>;
 
 // Main types
 export type Controller<T, C extends CRUDBase, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
-export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T> & SharedControllerProps;
+export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T, false> & SharedControllerProps;
 
 type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
 type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps;
@@ -122,13 +122,21 @@ export const createSubController = <T>(data: Omit<SharedControllerProps, '$paren
 		 */
 		return (c: ControllerProps) => {
 			const { $protected, $url: $parentUrl, $base } = c;
+			const { read, index } = template<T, CRUDBase, CRUDBase, false>({
+				...c,
+				$base,
+				$protected,
+				$parentUrl,
+				...data,
+			});
 
 			return {
 				...c,
 				$parentUrl,
 				...data,
 
-				read: template<T, CRUDBase, CRUDBase>({ ...c, $base, $protected, $parentUrl, ...data }).read,
+				read,
+				index,
 			} as SubControllerReturnType<T>;
 		};
 	};

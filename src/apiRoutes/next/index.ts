@@ -36,6 +36,9 @@ export const withNextRoute = (
 				return apiErrorResponse(req, res, subControllerNotFound(nextcontroller.at(2)));
 
 			controller = controller[nextcontroller.at(2)];
+		} else if (nextcontroller.length == 2 && controller[nextcontroller.at(1)]) {
+			controller = controller[nextcontroller.at(1)];
+			(nextcontroller as string[]).pop(); // Pop last item so getHandler doesn't confuse it with 'read'
 		}
 
 		// Get handler method from controller based on the request method

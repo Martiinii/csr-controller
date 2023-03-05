@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `index` to subcontrollers
+### Changed
+- fetcher, now accepts subcontroller without providing data
+- Next.js api route first search for subcontrollers, then pass query param as id
 
 ## [1.4.4] - 2023-03-05
 ### Fixed
@@ -22,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.2] - 2023-03-02
 ### Fixed
-- Passing data down from controller to sub controllers
+- Passing data down from controller to subcontrollers
 
 ## [1.4.1] - 2023-03-02
 ### Added
@@ -30,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.0] - 2023-03-01
 ### Added
-- Sub controllers
+- Subcontrollers
 - Debug middleware
 
 ### Fixed

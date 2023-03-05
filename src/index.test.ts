@@ -65,7 +65,13 @@ describe('Controller module', () => {
 				{ id: 123 }
 			);
 
-			expect(fetcher).toHaveBeenCalledTimes(1);
+			UserController.statistics.index();
+			expect(fetcher).toHaveBeenLastCalledWith(
+				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users' },
+				'GET'
+			);
+
+			expect(fetcher).toHaveBeenCalledTimes(2);
 		});
 
 		test('Custom defined method', () => {
