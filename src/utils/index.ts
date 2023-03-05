@@ -38,7 +38,7 @@ export const fetcher = <T>(
 		(c.$base ? `${c.$base}/` : '') +
 		(c.$parentUrl
 			? c.$parentUrl + (dataId ? `/${dataId}/` : '/') + c.$url + urlParams
-			: `${c.$url}/${dataId}` + urlParams);
+			: `${c.$url}/${dataId ? dataId : ''}` + urlParams);
 	// (c.$parentUrl ? `${c.$parentUrl}/${dataId}/${c.$url}` : `${c.$url}/${dataId}`) +
 	// (method == 'GET' && data ? '?' + new URLSearchParams(data as Record<string, string>) : '');
 
