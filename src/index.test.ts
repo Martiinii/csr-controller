@@ -19,12 +19,14 @@ describe('Controller module', () => {
 
 	const UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
-	})(crudTemplate, {
+	})(crudTemplate)({
 		subcontrollers: {
 			statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
 		},
 		methods: {
-			testing: t => {},
+			fullStat: t => () => {
+				return t.read({ id: 225 });
+			},
 		},
 	});
 
@@ -64,6 +66,13 @@ describe('Controller module', () => {
 			);
 
 			expect(fetcher).toHaveBeenCalledTimes(1);
+		});
+
+		test('Custom defined method', () => {
+			UserController.fullStat();
+			expect(fetcher).toHaveBeenCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET', {
+				id: 225,
+			});
 		});
 	});
 });
