@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.4.7] - 2023-03-05
 ### Added
 - `server` param to fetcher
 - `changeServer` to each controller
@@ -92,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial commit
 
-[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.6...HEAD
+[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.7...HEAD
+[1.4.7]: https://github.com/Martiinii/csr-controller/compare/v1.4.6...v1.4.7
 [1.4.6]: https://github.com/Martiinii/csr-controller/compare/v1.4.5...v1.4.6
 [1.4.5]: https://github.com/Martiinii/csr-controller/compare/v1.4.4...v1.4.5
 [1.4.4]: https://github.com/Martiinii/csr-controller/compare/v1.4.3...v1.4.4
