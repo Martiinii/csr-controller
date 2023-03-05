@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { BaseControllerMethods, Controller, ControllerMethods, ControllerProps, CRUDBase } from '../';
+import { BaseControllerMethods, Controller, ControllerMethods, ControllerProps, CRUDBase, SubController } from '../';
 
 type PartialParameter<T extends (...args: unknown[]) => unknown> = Partial<Parameters<T>[0]> extends infer R
 	? R extends undefined
@@ -9,6 +9,10 @@ type PartialParameter<T extends (...args: unknown[]) => unknown> = Partial<Param
 type PartialFunction<T extends (...args: unknown[]) => unknown> = PartialParameter<T> extends infer R
 	? (arg0: R) => ReturnType<T>
 	: never;
+
+type PickByType<T, Value> = {
+	[P in keyof T as T[P] extends Value | undefined ? P : never]: T[P];
+};
 
 /**
  * Allows to register every controller database handler
@@ -30,9 +34,11 @@ export const controllerRegistry = () => {
 		db: {
 			[method in keyof ControllerMethods<unknown, CRUDBase, CRUDBase>]?: PartialFunction<CONT[method]>;
 		} & {
-			[subs in keyof Omit<CONT, keyof ControllerMethods<unknown, CRUDBase, CRUDBase> | keyof ControllerProps>]: {
-				// @ts-ignore
-				[k in keyof CONT[subs] & keyof BaseControllerMethods<unknown>]: PartialFunction<CONT[subs][k]>;
+			[sk in keyof PickByType<
+				Omit<CONT, keyof ControllerMethods<unknown, CRUDBase, CRUDBase> | keyof ControllerProps>,
+				ReturnType<SubController<unknown>>
+			>]: {
+				[k in keyof CONT[sk] & keyof BaseControllerMethods<unknown>]: CONT[sk][k];
 			};
 		}
 	) => {
