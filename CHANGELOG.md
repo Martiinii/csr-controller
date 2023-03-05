@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.4.3] - 2023-03-05
 ### Added
 - Custom methods inside controllers
 
@@ -68,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial commit
 
-[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.2...HEAD
+[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.3...HEAD
+[1.4.3]: https://github.com/Martiinii/csr-controller/compare/v1.4.2...v1.4.3
 [1.4.2]: https://github.com/Martiinii/csr-controller/compare/v1.4.1...v1.4.2
 [1.4.1]: https://github.com/Martiinii/csr-controller/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/Martiinii/csr-controller/compare/v1.3.1...v1.4.0
