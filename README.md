@@ -21,7 +21,7 @@ To create your first controller use:
 
 	const UserController = createController<User, CRUDBase, UpdateUserType>({
 		$url: 'user',
-	})(crudTemplate);
+	})(crudTemplate)();
 ```
 First, we can skip generics and just call `createController()`, but for type safety it is recommended way. Every `Controller` needs three generics:
 1. Object type. In our case it's `User`
@@ -61,7 +61,7 @@ import { controllerRegistry } from "csr-controller/registry"
 
 const routes = controllerRegistry().register(...).handle();
 
-export default withNextRoute(routes)
+export default withNextRoute(routes, middlewareFoo, middlewareBar);
 ```
 
 This API page will handle every request from registered controllers.
