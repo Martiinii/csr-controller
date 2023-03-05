@@ -1,9 +1,11 @@
 import { CRUDBase, ControllerMethods, ControllerProps } from '..';
 
-type CreateTemplateData<T, C extends CRUDBase, U extends CRUDBase> = Partial<ControllerMethods<T, C, U>>;
+type CreateTemplateData<T, C extends CRUDBase, U extends CRUDBase> = Partial<
+	Omit<ControllerMethods<T, C, U>, 'changeServer'>
+>;
 export type TemplateReturn<T, C extends CRUDBase, U extends CRUDBase> = (
 	c: ControllerProps
-) => ControllerMethods<T, C, U>;
+) => Omit<ControllerMethods<T, C, U>, 'changeServer'>;
 
 /**
  * Creates template for controllers
@@ -14,5 +16,5 @@ export type TemplateReturn<T, C extends CRUDBase, U extends CRUDBase> = (
 export const createTemplate = (data: (c: ControllerProps) => CreateTemplateData<unknown, CRUDBase, CRUDBase>) => {
 	return data as <T, C extends CRUDBase, U extends CRUDBase, ISARR = true>(
 		c: ControllerProps
-	) => ControllerMethods<T, C, U, ISARR>;
+	) => Omit<ControllerMethods<T, C, U, ISARR>, 'changeServer'>;
 };

@@ -14,11 +14,11 @@ import { ControllerProps, CRUDBase, CRUDFetchMethod } from '../';
 export const fetcher = <T>(
 	c: ControllerProps,
 	method: (typeof CRUDFetchMethod)[number],
-	data?: (object & CRUDBase) | string,
-	server?: string
+	data?: (object & CRUDBase) | string
 ): Promise<T> => {
 	// Convert data from object | string to string | null
 	const dataId = typeof data === 'string' ? data : data != null ? data.id : null;
+	const server = c.$server ?? '';
 
 	// If using GET, we cannot pass body using fetch. Make sure to delete id so we don't get unnecessary query parameter
 	if (typeof data === 'object' && method == 'GET') {
@@ -27,14 +27,14 @@ export const fetcher = <T>(
 	}
 
 	/* Create url as:
-        /api/[base]/[parentUrl]/[dataId]/[url]
-        /api/[base]/[parentUrl]/[url]
-        /api/[base]/[url]/[dataId]
-        /api/[base]/[url]
+        [server]/api/[base]/[parentUrl]/[dataId]/[url]
+        [server]/api/[base]/[parentUrl]/[url]
+        [server]/api/[base]/[url]/[dataId]
+        [server]/api/[base]/[url]
     */
 	const urlParams = method == 'GET' && data ? `?${new URLSearchParams(data as Record<string, string>)}` : '';
 	const url =
-		`/api/` +
+		`${server}/api/` +
 		(c.$base ? `${c.$base}/` : '') +
 		(c.$parentUrl
 			? c.$parentUrl + (dataId ? `/${dataId}/` : '/') + c.$url + urlParams

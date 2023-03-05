@@ -17,8 +17,9 @@ describe('Controller module', () => {
 		age: number;
 	};
 
-	const UserController = createController<User, CRUDBase, CRUDBase>({
+	let UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
+		$server: 'example',
 	})(crudTemplate)({
 		subcontrollers: {
 			statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
@@ -30,29 +31,40 @@ describe('Controller module', () => {
 		},
 	});
 
+	UserController = UserController.changeServer('');
+
 	describe('Check default values', () => {
 		test('User controller', () => {
 			expect(UserController.$url).toBe('users');
 			expect(UserController.$base).toBe('custom');
 			expect(UserController.$protected).toBe(true);
+			expect(UserController.$server).toBe('');
 		});
 
 		test('Statistic sub-controller', () => {
 			expect(UserController.statistics.$url).toBe('stats');
 			expect(UserController.statistics.$base).toBe('custom');
 			expect(UserController.statistics.$protected).toBe(true);
+			expect(UserController.statistics.$server).toBe('');
 		});
 	});
 
 	describe('Fetcher calls', () => {
 		test('User controller', () => {
 			UserController.index();
-			expect(fetcher).toHaveBeenLastCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET');
+			expect(fetcher).toHaveBeenLastCalledWith(
+				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
+				'GET'
+			);
 
 			UserController.read({ id: 15 });
-			expect(fetcher).toHaveBeenLastCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET', {
-				id: 15,
-			});
+			expect(fetcher).toHaveBeenLastCalledWith(
+				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
+				'GET',
+				{
+					id: 15,
+				}
+			);
 
 			expect(fetcher).toHaveBeenCalledTimes(2);
 		});
@@ -60,14 +72,14 @@ describe('Controller module', () => {
 		test('Statistic sub-controller', () => {
 			UserController.statistics.read({ id: 123 });
 			expect(fetcher).toHaveBeenLastCalledWith(
-				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users' },
+				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users', $server: '' },
 				'GET',
 				{ id: 123 }
 			);
 
 			UserController.statistics.index();
 			expect(fetcher).toHaveBeenLastCalledWith(
-				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users' },
+				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users', $server: '' },
 				'GET'
 			);
 
@@ -76,9 +88,13 @@ describe('Controller module', () => {
 
 		test('Custom defined method', () => {
 			UserController.fullStat();
-			expect(fetcher).toHaveBeenCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET', {
-				id: 225,
-			});
+			expect(fetcher).toHaveBeenCalledWith(
+				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
+				'GET',
+				{
+					id: 225,
+				}
+			);
 		});
 	});
 });

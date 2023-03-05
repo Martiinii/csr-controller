@@ -21,6 +21,7 @@ export interface DefaultSharedControllerProps {
 }
 export interface DefaultControllerProps extends SharedControllerProps {
 	$base?: string;
+	$server?: string;
 }
 
 // Types made for augmentation
@@ -36,6 +37,8 @@ export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase, ISARR =
 	create: (data: C) => Promise<T | Record<string, never>>;
 	update: (data: U) => Promise<T | Record<string, never>>;
 	destroy: (data: CRUDBase) => Promise<T | Record<string, never>>;
+
+	changeServer: (server: string) => never;
 } & BaseControllerMethods<T, ISARR>;
 
 // Main types
@@ -52,6 +55,7 @@ type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps
  */
 export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data: ControllerProps) => {
 	data.$base ??= 'custom';
+	data.$server ??= '';
 	data.$protected ??= true;
 
 	/**
@@ -80,21 +84,48 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 			config.subcontrollers ??= {} as never;
 			config.methods ??= {} as never;
 
-			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: ReturnType<ST[k]> }>((p, c) => {
-				p[c] = config.subcontrollers[c](data);
-				return p;
-			}, {} as never);
+			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: SubControllerReturnType<unknown> }>(
+				(p, c) => {
+					p[c as KS] = config.subcontrollers[c](data);
+					return p;
+				},
+				{} as never
+			);
 
 			const mets = Object.keys(config.methods).reduce<{ [k in KM]: ReturnType<M[k]> }>((p, c) => {
 				p[c] = config.methods[c](template(data));
 				return p;
 			}, {} as never);
 
+			const changeServer = (server: string) => {
+				data.$server = server;
+
+				// Change each subcontroller $server and update template methods
+				Object.keys(subs).forEach(k => {
+					subs[k as KS] = { ...config.subcontrollers[k](data), $server: server };
+				});
+
+				return {
+					...data,
+					...template(data),
+					...subs,
+					...mets,
+					changeServer,
+				} as ControllerReturnType<
+					T,
+					C,
+					U,
+					KS extends never ? object : { [k in KS]: ReturnType<ST[k]> },
+					KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
+				>;
+			};
+
 			return {
 				...data,
 				...template(data),
 				...subs,
 				...mets,
+				changeServer,
 			} as ControllerReturnType<
 				T,
 				C,
