@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 
-import { createTemplate } from './template';
+import { TemplateReturn, createTemplate } from './template';
 
 export const CRUDFetchMethod = ['GET', 'POST', 'PATCH', 'DELETE'] as const;
 export interface DefaultCRUDBase {
@@ -31,7 +31,7 @@ export interface ControllerProps extends DefaultControllerProps {}
 export type BaseControllerMethods<T> = {
 	read: (data: CRUDBase) => Promise<T | Record<string, never>>;
 };
-export type ControllerMethods<T, C, U> = {
+export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase> = {
 	create: (data: C) => Promise<T | Record<string, never>>;
 	index: () => Promise<T[]>;
 	update: (data: U) => Promise<T | Record<string, never>>;
@@ -42,8 +42,8 @@ export type ControllerMethods<T, C, U> = {
 export type Controller<T, C extends CRUDBase, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
 export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T> & SharedControllerProps;
 
-type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB> = Controller<T, C, U> & SUB;
-type SubControllerReturnType<T> = ReturnType<SubController<T>> & DefaultControllerProps;
+type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
+type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps;
 /**
  * Create controller
  *
@@ -61,20 +61,37 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 	 * @param sc Array of subcontrollers
 	 * @returns Controller
 	 */
-	return <ST extends { [k: string]: SubController<unknown> }, K extends keyof ST>(
-		template: ReturnType<typeof createTemplate>,
-		sc?: ST
-	) => {
-		const subs = Object.keys(sc).reduce<{ [k in K]: ReturnType<ST[k]> }>((p, c) => {
-			p[c] = sc[c](data);
-			return p;
-		}, {} as never);
 
-		return {
-			...data,
-			...template<T, C, U>(data),
-			...subs,
-		} as ControllerReturnType<T, C, U, { [k in K]: ReturnType<ST[k]> }>;
+	//  TODO need to give proper generic type to create template
+
+	return <TEMPL extends TemplateReturn<T, C, U>>(template: TEMPL) => {
+		return <
+			G,
+			ST extends { [k: string]: SubController<unknown> },
+			KS extends keyof ST,
+			M extends { [k: string]: (t: ReturnType<TemplateReturn<T, C, U>>) => (data: never) => G },
+			KM extends keyof M
+		>(config?: {
+			subcontrollers?: ST;
+			methods?: M;
+		}) => {
+			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: ReturnType<ST[k]> }>((p, c) => {
+				p[c] = config.subcontrollers[c](data);
+				return p;
+			}, {} as never);
+
+			const mets = Object.keys(config.methods).reduce<{ [k in KM]: ReturnType<M[k]> }>((p, c) => {
+				p[c] = config.methods[c](template(data));
+				return p;
+			}, {} as never);
+
+			return {
+				...data,
+				...template(data),
+				...subs,
+				...mets,
+			} as ControllerReturnType<T, C, U, { [k in KS]: ReturnType<ST[k]> }, { [k in KM]: ReturnType<M[k]> }>;
+		};
 	};
 };
 
@@ -96,7 +113,7 @@ export const createSubController = <T>(data: Omit<SharedControllerProps, '$paren
 		 * Function to provide parent controller props
 		 *
 		 * @param c ControllerProps
-		 * @returns Subcontrollerz
+		 * @returns Subcontrollers
 		 */
 		return (c: ControllerProps) => {
 			const { $protected, $url: $parentUrl, $base } = c;

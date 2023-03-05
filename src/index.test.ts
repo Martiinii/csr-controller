@@ -19,8 +19,15 @@ describe('Controller module', () => {
 
 	const UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
-	})(crudTemplate, {
-		statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+	})(crudTemplate)({
+		subcontrollers: {
+			statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+		},
+		methods: {
+			fullStat: t => () => {
+				return t.read({ id: 225 });
+			},
+		},
 	});
 
 	describe('Check default values', () => {
@@ -59,6 +66,13 @@ describe('Controller module', () => {
 			);
 
 			expect(fetcher).toHaveBeenCalledTimes(1);
+		});
+
+		test('Custom defined method', () => {
+			UserController.fullStat();
+			expect(fetcher).toHaveBeenCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET', {
+				id: 225,
+			});
 		});
 	});
 });
