@@ -30,7 +30,7 @@ export const controllerRegistry = () => {
 	 * @returns
 	 */
 	const register = <CONT extends Controller<unknown, CRUDBase, CRUDBase>>(
-		c: CONT,
+		controller: CONT,
 		db: {
 			[method in keyof ControllerMethods<unknown, CRUDBase, CRUDBase>]?: PartialFunction<CONT[method]>;
 		} & {
@@ -43,21 +43,24 @@ export const controllerRegistry = () => {
 		}
 	) => {
 		const { index, create, destroy, read, update, ...rest } = db;
+		// Create copy of controller so we won't delete original keys later
+		const copy = { ...controller };
 
-		const subs = Object.keys(rest).reduce<{ [k: string]: BaseControllerMethods<unknown> }>((p, s) => {
-			p[c[s].$url] = rest[s];
+		Object.keys(rest).forEach(k => {
+			// Remap properties
+			copy[k] = { ...copy[k], ...rest[k] };
 
-			return p;
-		}, {} as never);
+			// Remap key name
+			delete Object.assign(copy, { [copy[k].$url]: copy[k] })[k];
+		});
 
-		routes.set(c.$url, {
-			...c,
+		routes.set(copy.$url, {
+			...copy,
 			index,
 			create,
 			destroy,
 			read,
 			update,
-			...subs,
 		});
 
 		return { register, handle };
