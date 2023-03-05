@@ -48,7 +48,8 @@ export const controllerRegistry = () => {
 
 		Object.keys(rest).forEach(k => {
 			// Remap properties
-			copy[k] = { ...copy[k], ...rest[k] };
+			const { index, read } = rest[k];
+			copy[k] = { ...copy[k], ...rest[k], index, read };
 
 			// Remap key name
 			delete Object.assign(copy, { [copy[k].$url]: copy[k] })[k];
