@@ -13,6 +13,7 @@ export interface CRUDBase extends DefaultCRUDBase {}
  * @param $protected Optional parameter to define if route is protected (must define own logic as middleware)
  * @param $parentUrl Optional parameter used by sub controllers
  */
+
 // Shared props between controller and sub controllers
 export interface DefaultSharedControllerProps {
 	$url: string;
@@ -33,7 +34,7 @@ export type BaseControllerMethods<T, ISARR = true> = {
 	index: () => Promise<ISARR extends true ? T[] : T>;
 	read: (data: CRUDBase) => Promise<T | Record<string, never>>;
 };
-export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase, ISARR = true> = {
+export type ControllerMethods<T, C, U extends CRUDBase, ISARR = true> = {
 	create: (data: C) => Promise<T | Record<string, never>>;
 	update: (data: U) => Promise<T | Record<string, never>>;
 	destroy: (data: CRUDBase) => Promise<T | Record<string, never>>;
@@ -42,18 +43,19 @@ export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase, ISARR =
 } & BaseControllerMethods<T, ISARR>;
 
 // Main types
-export type Controller<T, C extends CRUDBase, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
+export type Controller<T, C, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
 export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T, false> & SharedControllerProps;
 
-type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
+type ControllerReturnType<T, C, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
 type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps;
+
 /**
  * Create controller
  *
  * @param data {@link ControllerProps | Configuration object} for the controller
  * @returns Function to provide template
  */
-export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data: ControllerProps) => {
+export const createController = <T, C, U extends CRUDBase>(data: ControllerProps) => {
 	data.$base ??= 'custom';
 	data.$server ??= '';
 	data.$protected ??= true;
@@ -159,7 +161,7 @@ export const createSubController = <T>(data: Omit<SharedControllerProps, '$paren
 		 */
 		return (c: ControllerProps) => {
 			const { $protected, $url: $parentUrl, $base } = c;
-			const { read, index } = template<T, CRUDBase, CRUDBase, false>({
+			const { read, index } = template<T, unknown, CRUDBase, false>({
 				...c,
 				$base,
 				$protected,
