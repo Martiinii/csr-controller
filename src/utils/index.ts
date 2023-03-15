@@ -1,3 +1,4 @@
+import { IpcRenderer } from 'electron';
 import { ControllerProps, CRUDBase, CRUDFetchMethod } from '../';
 
 /**
@@ -6,10 +7,7 @@ import { ControllerProps, CRUDBase, CRUDFetchMethod } from '../';
  * @param c Controller properties
  * @param method CRUD method, e.g. GET or POST
  * @param data Optional object with data
- * @param server Optional server parameter to use with shared controllers between projects
  * @returns Promise with result from fetch
- *
- * @todo implement server parameter logic
  */
 export const fetcher = <T>(
 	c: ControllerProps,
@@ -46,4 +44,22 @@ export const fetcher = <T>(
 		method,
 		body: method !== 'GET' ? JSON.stringify(typeof data === 'string' ? null : data) : null,
 	}).then(res => res.json()) as Promise<T>;
+};
+
+/**
+ * Electron ipc invoker
+ *
+ * @param ipcRenderer ipcRenderer from electron
+ * @param c Controller
+ * @param method CRUD method, e.g. GET or POST
+ * @param data Optional object with data
+ * @returns Promise with result from ipcInvoke
+ */
+export const ipcInvoker = <T>(
+	ipcRenderer: IpcRenderer,
+	c: ControllerProps,
+	method: (typeof CRUDFetchMethod)[number],
+	data?: object & CRUDBase
+): Promise<T> => {
+	return ipcRenderer.invoke('csr-controller', c, method, data) as Promise<T>;
 };
