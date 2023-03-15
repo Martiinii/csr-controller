@@ -26,4 +26,9 @@ export const controllerNotFound = (path: string): APIFullErrorResponse => ({
 	error: `${path}Controller not found`,
 });
 
+export const badRequestResponse: APIFullErrorResponse = {
+	status: 400,
+	error: 'Missing data',
+};
+
 export const subControllerNotFound = (path: string): APIFullErrorResponse => controllerNotFound(`${path}Sub`);
