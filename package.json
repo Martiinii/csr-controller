@@ -1,6 +1,6 @@
 {
     "name": "csr-controller",
-    "version": "1.4.7",
+    "version": "1.4.8",
     "description": "DB Controller for client side rendering",
     "main": "index.js",
     "types": "index.d.ts",
