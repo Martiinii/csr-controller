@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Electron support: `withElectronInvokations` and `ipcTemplate`
+- `badRequestResponse` with status `400` if handler throws error when executing
+
+### Changed
+- TypeScript compilation module to `CommonJS`
+
+### Fixed
+- Second generic of controller (create) doesn't need to extend CRUDBase
+- controllerRegistry `register` function type when registering more than one controller (previosuly was of type any)
 
 ## [1.4.7] - 2023-03-05
 ### Added
