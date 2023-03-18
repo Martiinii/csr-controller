@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.4.10] - 2023-03-18
 ### Changed
 - Fetcher and electron route can throw errors. It is useful when using `useSWR`, because it will be passed as error instead of data
 
@@ -112,7 +114,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial commit
 
-[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.9...HEAD
+[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.4.10...HEAD
+[1.4.10]: https://github.com/Martiinii/csr-controller/compare/v1.4.9...v1.4.10
 [1.4.9]: https://github.com/Martiinii/csr-controller/compare/v1.4.8...v1.4.9
 [1.4.8]: https://github.com/Martiinii/csr-controller/compare/v1.4.7...v1.4.8
 [1.4.7]: https://github.com/Martiinii/csr-controller/compare/v1.4.6...v1.4.7
