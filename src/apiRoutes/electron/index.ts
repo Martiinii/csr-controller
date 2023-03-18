@@ -72,9 +72,7 @@ export const withElectronInvokations = (
 };
 
 const apiErrorResponse = (msg: APIFullErrorResponse) => {
-	return {
-		error: {
-			msg: msg.error,
-		},
+	throw {
+		error: msg.error,
 	};
 };

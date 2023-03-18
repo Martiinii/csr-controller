@@ -9,7 +9,7 @@ import { ControllerProps, CRUDBase, CRUDFetchMethod } from '../';
  * @param data Optional object with data
  * @returns Promise with result from fetch
  */
-export const fetcher = <T>(
+export const fetcher = async <T>(
 	c: ControllerProps,
 	method: (typeof CRUDFetchMethod)[number],
 	data?: (object & CRUDBase) | string
@@ -40,10 +40,19 @@ export const fetcher = <T>(
 	// (c.$parentUrl ? `${c.$parentUrl}/${dataId}/${c.$url}` : `${c.$url}/${dataId}`) +
 	// (method == 'GET' && data ? '?' + new URLSearchParams(data as Record<string, string>) : '');
 
-	return fetch(url, {
+	const res = await fetch(url, {
 		method,
 		body: method !== 'GET' ? JSON.stringify(typeof data === 'string' ? null : data) : null,
-	}).then(res => res.json()) as Promise<T>;
+	});
+
+	if (!res.ok) {
+		const error = new Error('An error occured while fetching the data.');
+		error.message = (await res.json())?.error ?? 'Undefined error';
+
+		throw error;
+	}
+
+	return (await res.json()) as Promise<T>;
 };
 
 /**
