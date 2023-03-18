@@ -7,11 +7,11 @@ type PickByType<T, Value> = {
 type RegisterFunction = <CONT extends Controller<unknown, never, never>>(
 	controller: CONT,
 	db: {
-		[method in keyof ControllerMethods<unknown, never, never>]?: CONT[method];
+		[method in keyof Omit<ControllerMethods<unknown, never, never>, 'changeServer'>]?: CONT[method];
 	} & {
 		[sk in keyof PickByType<
 			Omit<CONT, keyof ControllerMethods<unknown, never, never> | keyof ControllerProps>,
-			ReturnType<SubController<never>>
+			ReturnType<SubController<unknown>>
 		>]: {
 			[k in keyof CONT[sk] & keyof BaseControllerMethods<unknown>]?: CONT[sk][k];
 		};
