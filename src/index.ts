@@ -47,7 +47,7 @@ export type ControllerMethods<T, C, U extends CRUDBase, ISARR = true> = {
 export type Controller<T, C, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
 export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T, false> & SharedControllerProps;
 
-type ControllerReturnType<T, C, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
+export type ControllerReturnType<T, C, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
 type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps;
 
 /**
