@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- When creating subcontrollers we don't need to provide template anymore. It is inherited by parent
+- Controller `changeServer` method is now named `$changeServer` to make it visually stand out as internal method
+
+### Added
+- Added `$clone` method to controller. It is useful when sharing controllers in multiple projects with using different templates
 
 ## [1.4.10] - 2023-03-18
 ### Changed
