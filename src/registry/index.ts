@@ -51,6 +51,8 @@ export const controllerRegistry = () => {
 		const copy = { ...controller };
 
 		Object.keys(rest).forEach(k => {
+			if (typeof rest[k] != 'object') return;
+
 			// Remap properties
 			const { index, read } = rest[k];
 			copy[k] = { ...copy[k], ...rest[k], index, read };
