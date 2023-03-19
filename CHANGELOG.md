@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.5.2] - 2023-03-19
 ### Fixed
 - Controller registry now allows to pass controller as second parameter.
 
@@ -131,7 +133,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial commit
 
-[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/Martiinii/csr-controller/compare/v1.5.2...HEAD
+[1.5.2]: https://github.com/Martiinii/csr-controller/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/Martiinii/csr-controller/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/Martiinii/csr-controller/compare/v1.4.10...v1.5.0
 [1.4.10]: https://github.com/Martiinii/csr-controller/compare/v1.4.9...v1.4.10
