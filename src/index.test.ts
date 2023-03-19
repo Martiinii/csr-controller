@@ -1,5 +1,6 @@
+import { IpcRenderer } from 'electron';
 import { createController, createSubController, CRUDBase } from './';
-import { crudTemplate } from './template/';
+import { crudTemplate, ipcTemplate } from './template/';
 
 import { fetcher } from './utils';
 
@@ -20,9 +21,9 @@ describe('Controller module', () => {
 	let UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
 		$server: 'example',
-	})(crudTemplate)({
+	})(ipcTemplate(null as unknown as IpcRenderer))({
 		subcontrollers: {
-			statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+			statistics: createSubController<{ stat: number }>({ $url: 'stats' }),
 		},
 		methods: {
 			fullStat: t => () => {
@@ -31,20 +32,32 @@ describe('Controller module', () => {
 		},
 	});
 
-	UserController = UserController.changeServer('');
+	// For testing if template changes correctly
+	UserController = UserController.$clone(crudTemplate);
+
+	// For testing if server changes correctly
+	UserController = UserController.$changeServer('');
 
 	describe('Check default values', () => {
 		test('User controller', () => {
 			expect(UserController.$url).toBe('users');
 			expect(UserController.$base).toBe('custom');
 			expect(UserController.$protected).toBe(true);
-			expect(UserController.$server).toBe('');
 		});
 
 		test('Statistic sub-controller', () => {
 			expect(UserController.statistics.$url).toBe('stats');
 			expect(UserController.statistics.$base).toBe('custom');
 			expect(UserController.statistics.$protected).toBe(true);
+		});
+	});
+
+	describe('Check server change', () => {
+		test('User controller', () => {
+			expect(UserController.$server).toBe('');
+		});
+
+		test('Statistic sub-controller', () => {
 			expect(UserController.statistics.$server).toBe('');
 		});
 	});

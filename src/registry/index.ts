@@ -7,7 +7,7 @@ type PickByType<T, Value> = {
 type RegisterFunction = <CONT extends Controller<unknown, never, never>>(
 	controller: CONT,
 	db: {
-		[method in keyof Omit<ControllerMethods<unknown, never, never>, 'changeServer'>]?: CONT[method];
+		[method in keyof Omit<ControllerMethods<unknown, never, never>, '$changeServer' | '$clone'>]?: CONT[method];
 	} & {
 		[sk in keyof PickByType<
 			Omit<CONT, keyof ControllerMethods<unknown, never, never> | keyof ControllerProps>,

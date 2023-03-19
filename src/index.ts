@@ -39,7 +39,8 @@ export type ControllerMethods<T, C, U extends CRUDBase, ISARR = true> = {
 	update: (data: U) => Promise<T | Record<string, never>>;
 	destroy: (data: CRUDBase) => Promise<T | Record<string, never>>;
 
-	changeServer: (server: string) => never;
+	$changeServer: (server: string) => never;
+	$clone: (template: TemplateReturn<T, C, U>) => never;
 } & BaseControllerMethods<T, ISARR>;
 
 // Main types
@@ -73,7 +74,7 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 	return <TEMPL extends TemplateReturn<T, C, U>>(template: TEMPL) => {
 		return <
 			G,
-			ST extends { [k: string]: SubController<unknown> },
+			ST extends { [k: string]: (t: ReturnType<typeof createTemplate>) => SubController<unknown> },
 			KS extends keyof ST,
 			M extends { [k: string]: (t: ReturnType<TemplateReturn<T, C, U>>) => (data: never) => G },
 			KM extends keyof M
@@ -88,7 +89,7 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 
 			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: SubControllerReturnType<unknown> }>(
 				(p, c) => {
-					p[c as KS] = config.subcontrollers[c](data);
+					p[c as KS] = config.subcontrollers[c](template as never)(data);
 					return p;
 				},
 				{} as never
@@ -99,12 +100,18 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 				return p;
 			}, {} as never);
 
-			const changeServer = (server: string) => {
+			// Function to change server for controller and subcontrollers
+			const $changeServer = (server: string) => {
 				data.$server = server;
 
 				// Change each subcontroller $server and update template methods
 				Object.keys(subs).forEach(k => {
-					subs[k as KS] = { ...config.subcontrollers[k](data), $server: server };
+					subs[k as KS] = { ...config.subcontrollers[k](template as never)(data), $server: server };
+				});
+
+				// Change each method template
+				Object.keys(mets).forEach(k => {
+					mets[k as KM] = config.methods[k](template(data)) as never;
 				});
 
 				return {
@@ -112,14 +119,41 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 					...template(data),
 					...subs,
 					...mets,
-					changeServer,
+					$changeServer,
+					$clone,
 				} as ControllerReturnType<
 					T,
 					C,
 					U,
-					KS extends never ? object : { [k in KS]: ReturnType<ST[k]> },
+					KS extends never ? object : { [k in KS]: ReturnType<ReturnType<ST[k]>> },
 					KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
 				>;
+			};
+
+			// Function to clone controller with new template
+			const $clone = (t: TEMPL) => {
+				template = t;
+
+				// Change each subcontroller template
+				Object.keys(subs).forEach(k => {
+					subs[k as KS] = { ...config.subcontrollers[k](t as never)(data) };
+				});
+				const res = {
+					...data,
+					...subs,
+					...mets,
+					...t(data),
+					$changeServer,
+					$clone,
+				} as ControllerReturnType<
+					T,
+					C,
+					U,
+					KS extends never ? object : { [k in KS]: ReturnType<ReturnType<ST[k]>> },
+					KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
+				>;
+
+				return res;
 			};
 
 			return {
@@ -127,12 +161,13 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 				...template(data),
 				...subs,
 				...mets,
-				changeServer,
+				$changeServer,
+				$clone,
 			} as ControllerReturnType<
 				T,
 				C,
 				U,
-				KS extends never ? object : { [k in KS]: ReturnType<ST[k]> },
+				KS extends never ? object : { [k in KS]: ReturnType<ReturnType<ST[k]>> },
 				KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
 			>;
 		};
