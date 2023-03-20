@@ -33,7 +33,7 @@ describe('Controller module', () => {
 	});
 
 	// For testing if template changes correctly
-	UserController = UserController.$clone(crudTemplate());
+	UserController = UserController.$clone(crudTemplate(fetch));
 
 	// For testing if server changes correctly
 	UserController = UserController.$changeServer('');

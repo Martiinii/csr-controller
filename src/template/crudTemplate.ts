@@ -6,9 +6,7 @@ import { createTemplate } from './createTemplate';
  *
  * @see {@link createTemplate}
  */
-export const crudTemplate = (f?: typeof fetch) => {
-	f ??= fetch;
-
+export const crudTemplate = (f: typeof fetch) => {
 	return createTemplate(c => ({
 		create: data => fetcher(f, c, 'POST', data),
 
