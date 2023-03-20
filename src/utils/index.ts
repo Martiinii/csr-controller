@@ -10,6 +10,7 @@ import { ControllerProps, CRUDBase, CRUDFetchMethod } from '../';
  * @returns Promise with result from fetch
  */
 export const fetcher = async <T>(
+	f: typeof fetch,
 	c: ControllerProps,
 	method: (typeof CRUDFetchMethod)[number],
 	data?: (object & CRUDBase) | string
@@ -40,7 +41,7 @@ export const fetcher = async <T>(
 	// (c.$parentUrl ? `${c.$parentUrl}/${dataId}/${c.$url}` : `${c.$url}/${dataId}`) +
 	// (method == 'GET' && data ? '?' + new URLSearchParams(data as Record<string, string>) : '');
 
-	const res = await fetch(url, {
+	const res = await f(url, {
 		method,
 		body: method !== 'GET' ? JSON.stringify(typeof data === 'string' ? null : data) : null,
 	});

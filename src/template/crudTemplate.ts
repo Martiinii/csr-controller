@@ -6,13 +6,17 @@ import { createTemplate } from './createTemplate';
  *
  * @see {@link createTemplate}
  */
-export const crudTemplate = createTemplate(c => ({
-	create: data => fetcher(c, 'POST', data),
+export const crudTemplate = (f?: typeof fetch) => {
+	f ??= fetch;
 
-	index: () => fetcher(c, 'GET'),
-	read: data => fetcher(c, 'GET', data),
+	return createTemplate(c => ({
+		create: data => fetcher(f, c, 'POST', data),
 
-	update: data => fetcher(c, 'PATCH', data),
+		index: () => fetcher(f, c, 'GET'),
+		read: data => fetcher(f, c, 'GET', data),
 
-	destroy: data => fetcher(c, 'DELETE', data),
-}));
+		update: data => fetcher(f, c, 'PATCH', data),
+
+		destroy: data => fetcher(f, c, 'DELETE', data),
+	}));
+};

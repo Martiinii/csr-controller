@@ -11,7 +11,7 @@ describe('Register module', () => {
 	const UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
 		$server: 'example',
-	})(crudTemplate)({
+	})(crudTemplate())({
 		subcontrollers: {
 			statistics: createSubController<{ stat: number }>({ $url: 'stats' }),
 		},

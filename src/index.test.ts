@@ -33,7 +33,7 @@ describe('Controller module', () => {
 	});
 
 	// For testing if template changes correctly
-	UserController = UserController.$clone(crudTemplate);
+	UserController = UserController.$clone(crudTemplate());
 
 	// For testing if server changes correctly
 	UserController = UserController.$changeServer('');
@@ -66,12 +66,14 @@ describe('Controller module', () => {
 		test('User controller', () => {
 			UserController.index();
 			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
 				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
 				'GET'
 			);
 
 			UserController.read({ id: 15 });
 			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
 				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
 				'GET',
 				{
@@ -85,6 +87,7 @@ describe('Controller module', () => {
 		test('Statistic sub-controller', () => {
 			UserController.statistics.read({ id: 123 });
 			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
 				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users', $server: '' },
 				'GET',
 				{ id: 123 }
@@ -92,6 +95,7 @@ describe('Controller module', () => {
 
 			UserController.statistics.index();
 			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
 				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users', $server: '' },
 				'GET'
 			);
@@ -102,6 +106,7 @@ describe('Controller module', () => {
 		test('Custom defined method', () => {
 			UserController.fullStat();
 			expect(fetcher).toHaveBeenCalledWith(
+				expect.any(Function),
 				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
 				'GET',
 				{
