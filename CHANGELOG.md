@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Types for controller custom methods. Types were breaking if atleast two methods were created.
+- Fixed custom methods generic parameters
 
 ## [1.5.4] - 2023-03-20
 ### Changed
