@@ -29,6 +29,11 @@ describe('Controller module', () => {
 			fullStat: t => () => {
 				return t.read({ id: 225 });
 			},
+			secondMethod:
+				() =>
+				<T extends 'alfa' | 'beta'>(x: T) => {
+					return x;
+				},
 		},
 	});
 

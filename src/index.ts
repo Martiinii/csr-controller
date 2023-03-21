@@ -73,10 +73,10 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 
 	return <TEMPL extends TemplateReturn<T, C, U>>(template: TEMPL) => {
 		return <
-			G,
 			ST extends { [k: string]: (t: ReturnType<typeof createTemplate>) => SubController<unknown> },
 			KS extends keyof ST,
-			M extends { [k: string]: (t: ReturnType<TemplateReturn<T, C, U>>) => (data: never) => G },
+			MB extends (t: ReturnType<TemplateReturn<T, C, U>>) => unknown,
+			M extends { [k: string]: MB },
 			KM extends keyof M
 		>(config?: {
 			subcontrollers?: ST;
@@ -167,8 +167,8 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 				T,
 				C,
 				U,
-				KS extends never ? object : { [k in KS]: ReturnType<ReturnType<ST[k]>> },
-				KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
+				{ [k in KS]: ReturnType<ReturnType<ST[k]>> },
+				{ [k in KM]: ReturnType<M[k]> }
 			>;
 		};
 	};
