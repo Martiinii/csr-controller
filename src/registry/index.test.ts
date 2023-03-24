@@ -14,15 +14,25 @@ describe('Register module', () => {
 	})(crudTemplate(fetch))({
 		subcontrollers: {
 			statistics: createSubController<{ stat: number }>({ $url: 'stats' }),
+			seconder: createSubController<{ noIdea: number }>({ $url: 'seconder' }),
 		},
 		methods: {
-			fullStat: t => () => {
+			fullStat: t => () => t.index(),
+			secondMethod: t => () => {
 				return t.read({ id: 225 });
 			},
 		},
 	});
 
-	const routes = controllerRegistry().register(UserController, UserController).handle();
+	const routes = controllerRegistry()
+		.register(UserController, {
+			index: async () => {
+				return [];
+			},
+			statistics: {},
+			seconder: {},
+		})
+		.handle();
 
 	test('Register handle', () => {
 		expect(routes.has('users')).toBeTruthy();

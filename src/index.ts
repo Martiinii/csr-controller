@@ -50,6 +50,8 @@ export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T, 
 export type ControllerReturnType<T, C, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
 type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps;
 
+type IsEmpty<T> = [T] extends [never] | [''] ? true : false;
+
 /**
  * Create controller
  *
@@ -73,13 +75,16 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 
 	return <TEMPL extends TemplateReturn<T, C, U>>(template: TEMPL) => {
 		return <
-			ST extends { [k: string]: (t: ReturnType<typeof createTemplate>) => SubController<unknown> },
-			KS extends keyof ST,
-			MB extends (t: ReturnType<TemplateReturn<T, C, U>>) => unknown,
-			M extends { [k: string]: MB },
-			KM extends keyof M
+			ST extends (t: ReturnType<typeof createTemplate>) => SubController<unknown>,
+			MT extends (t: ReturnType<TemplateReturn<T, C, U>>) => unknown,
+			KS extends keyof S,
+			M extends { [k: string]: MT },
+			// Disabling ban-types because Record<string, never> doesn't achieve same functionality as {} without writing more complex code
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			S extends { [k: string]: ST } = {},
+			KM extends keyof M = ''
 		>(config?: {
-			subcontrollers?: ST;
+			subcontrollers?: S;
 			methods?: M;
 		}) => {
 			// Default values
@@ -121,12 +126,12 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 					...mets,
 					$changeServer,
 					$clone,
-				} as ControllerReturnType<
+				} as unknown as ControllerReturnType<
 					T,
 					C,
 					U,
-					KS extends never ? object : { [k in KS]: ReturnType<ReturnType<ST[k]>> },
-					KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
+					{ [k in KS]: ReturnType<ReturnType<S[k]>> },
+					IsEmpty<KM> extends true ? Record<string, never> : { [k in KM]: ReturnType<M[k]> }
 				>;
 			};
 
@@ -138,22 +143,20 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 				Object.keys(subs).forEach(k => {
 					subs[k as KS] = { ...config.subcontrollers[k](t as never)(data) };
 				});
-				const res = {
+				return {
 					...data,
 					...subs,
 					...mets,
 					...t(data),
 					$changeServer,
 					$clone,
-				} as ControllerReturnType<
+				} as unknown as ControllerReturnType<
 					T,
 					C,
 					U,
-					KS extends never ? object : { [k in KS]: ReturnType<ReturnType<ST[k]>> },
-					KM extends never ? object : { [k in KM]: ReturnType<M[k]> }
+					{ [k in KS]: ReturnType<ReturnType<S[k]>> },
+					IsEmpty<KM> extends true ? Record<string, never> : { [k in KM]: ReturnType<M[k]> }
 				>;
-
-				return res;
 			};
 
 			return {
@@ -163,12 +166,12 @@ export const createController = <T, C, U extends CRUDBase>(data: ControllerProps
 				...mets,
 				$changeServer,
 				$clone,
-			} as ControllerReturnType<
+			} as unknown as ControllerReturnType<
 				T,
 				C,
 				U,
-				{ [k in KS]: ReturnType<ReturnType<ST[k]>> },
-				{ [k in KM]: ReturnType<M[k]> }
+				{ [k in KS]: ReturnType<ReturnType<S[k]>> },
+				IsEmpty<KM> extends true ? Record<string, never> : { [k in KM]: ReturnType<M[k]> }
 			>;
 		};
 	};

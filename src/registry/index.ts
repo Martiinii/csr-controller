@@ -1,26 +1,11 @@
-import {
-	BaseControllerMethods,
-	Controller,
-	ControllerMethods,
-	ControllerProps,
-	ControllerReturnType,
-	CRUDBase,
-	SubController,
-} from '../';
-
-type PickByType<T, Value> = {
-	[P in keyof T as T[P] extends Value | undefined ? P : never]: T[P];
-};
+import { BaseControllerMethods, Controller, ControllerMethods, ControllerReturnType, CRUDBase } from '../';
 
 type RegisterFunction = <T, C, U extends CRUDBase, S, M, CONT extends ControllerReturnType<T, C, U, S, M>>(
 	controller: ControllerReturnType<T, C, U, S, M>,
 	db: {
 		[method in keyof Omit<ControllerMethods<unknown, never, never>, '$changeServer' | '$clone'>]?: CONT[method];
 	} & {
-		[sk in keyof PickByType<
-			Omit<CONT, keyof ControllerMethods<unknown, never, never> | keyof ControllerProps>,
-			ReturnType<SubController<unknown>>
-		>]: {
+		[sk in keyof S]: {
 			[k in keyof CONT[sk] & keyof BaseControllerMethods<unknown>]?: CONT[sk][k];
 		};
 	}
