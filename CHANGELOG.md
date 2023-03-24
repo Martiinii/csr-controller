@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Finally, fully fixed types for controller. The issue was created by not providing config object or by providing empty. It is now resolved
 
 ## [1.5.5] - 2023-03-21
 ### Fixed
