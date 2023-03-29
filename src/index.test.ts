@@ -1,5 +1,6 @@
+import { IpcRenderer } from 'electron';
 import { createController, createSubController, CRUDBase } from './';
-import { crudTemplate } from './template/';
+import { crudTemplate, ipcTemplate } from './template/';
 
 import { fetcher } from './utils';
 
@@ -17,18 +18,30 @@ describe('Controller module', () => {
 		age: number;
 	};
 
-	const UserController = createController<User, CRUDBase, CRUDBase>({
+	let UserController = createController<User, CRUDBase, CRUDBase>({
 		$url: 'users',
-	})(crudTemplate)({
+		$server: 'example',
+	})(ipcTemplate(null as unknown as IpcRenderer))({
 		subcontrollers: {
-			statistics: createSubController<{ stat: number }>({ $url: 'stats' })(crudTemplate),
+			statistics: createSubController<{ stat: number }>({ $url: 'stats' }),
 		},
 		methods: {
 			fullStat: t => () => {
 				return t.read({ id: 225 });
 			},
+			secondMethod:
+				() =>
+				<T extends 'alfa' | 'beta'>(x: T) => {
+					return x;
+				},
 		},
 	});
+
+	// For testing if template changes correctly
+	UserController = UserController.$clone(crudTemplate(fetch));
+
+	// For testing if server changes correctly
+	UserController = UserController.$changeServer('');
 
 	describe('Check default values', () => {
 		test('User controller', () => {
@@ -44,15 +57,34 @@ describe('Controller module', () => {
 		});
 	});
 
+	describe('Check server change', () => {
+		test('User controller', () => {
+			expect(UserController.$server).toBe('');
+		});
+
+		test('Statistic sub-controller', () => {
+			expect(UserController.statistics.$server).toBe('');
+		});
+	});
+
 	describe('Fetcher calls', () => {
 		test('User controller', () => {
 			UserController.index();
-			expect(fetcher).toHaveBeenLastCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET');
+			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
+				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
+				'GET'
+			);
 
 			UserController.read({ id: 15 });
-			expect(fetcher).toHaveBeenLastCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET', {
-				id: 15,
-			});
+			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
+				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
+				'GET',
+				{
+					id: 15,
+				}
+			);
 
 			expect(fetcher).toHaveBeenCalledTimes(2);
 		});
@@ -60,19 +92,32 @@ describe('Controller module', () => {
 		test('Statistic sub-controller', () => {
 			UserController.statistics.read({ id: 123 });
 			expect(fetcher).toHaveBeenLastCalledWith(
-				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users' },
+				expect.any(Function),
+				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users', $server: '' },
 				'GET',
 				{ id: 123 }
 			);
 
-			expect(fetcher).toHaveBeenCalledTimes(1);
+			UserController.statistics.index();
+			expect(fetcher).toHaveBeenLastCalledWith(
+				expect.any(Function),
+				{ $base: 'custom', $protected: true, $url: 'stats', $parentUrl: 'users', $server: '' },
+				'GET'
+			);
+
+			expect(fetcher).toHaveBeenCalledTimes(2);
 		});
 
 		test('Custom defined method', () => {
 			UserController.fullStat();
-			expect(fetcher).toHaveBeenCalledWith({ $base: 'custom', $protected: true, $url: 'users' }, 'GET', {
-				id: 225,
-			});
+			expect(fetcher).toHaveBeenCalledWith(
+				expect.any(Function),
+				{ $base: 'custom', $protected: true, $url: 'users', $server: '' },
+				'GET',
+				{
+					id: 225,
+				}
+			);
 		});
 	});
 });

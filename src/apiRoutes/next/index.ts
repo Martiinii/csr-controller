@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {
 	APIErrorResponse,
 	APIFullErrorResponse,
+	badRequestResponse,
 	controllerNotFound,
 	subControllerNotFound,
 	unimplementedMethodResponse,
@@ -11,13 +12,13 @@ import { ControllerMiddleware } from '../../middleware';
 import { Controller, CRUDBase } from '../..';
 
 /**
- * Default Next API route to use with controllers
+ * Next API route to use with controllers
  *
  * @param args Routes made with controllerRegistry
  * @param middlewares Array of middlewares to execute (in order)
  */
 export const withNextRoute = (
-	args: Map<string, Controller<unknown, CRUDBase, CRUDBase>>,
+	args: Map<string, Controller<unknown, unknown, CRUDBase>>,
 	...middlewares: ControllerMiddleware[]
 ) => {
 	return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -25,17 +26,23 @@ export const withNextRoute = (
 		const { nextcontroller, ...query } = req.query;
 
 		// If the route is not found in map there is no controller defined
-		if (!args.has(nextcontroller.at(0)))
-			return apiErrorResponse(req, res, controllerNotFound(nextcontroller.at(0)));
+		if (!args.has(nextcontroller.at(0))) return apiErrorResponse(res, controllerNotFound(nextcontroller.at(0)));
 
 		let controller = args.get(nextcontroller.at(0));
 
 		// Use sub controller?
 		if (nextcontroller.at(2)) {
-			if (!controller[nextcontroller.at(2)])
-				return apiErrorResponse(req, res, subControllerNotFound(nextcontroller.at(2)));
+			if (!controller[nextcontroller.at(2)]) {
+				return apiErrorResponse(res, subControllerNotFound(nextcontroller.at(2)));
+			}
 
 			controller = controller[nextcontroller.at(2)];
+		} else if (nextcontroller.length == 2 && controller[nextcontroller.at(1)]) {
+			// ^ If we use index method from subcontroller
+			controller = controller[nextcontroller.at(1)];
+
+			// Pop last item so getHandler doesn't confuse it with 'read'
+			(nextcontroller as string[]).pop();
 		}
 
 		// Get handler method from controller based on the request method
@@ -43,7 +50,7 @@ export const withNextRoute = (
 
 		// If the handler is not implemented
 		if (handler == null) {
-			return apiErrorResponse(req, res, unimplementedMethodResponse);
+			return apiErrorResponse(res, unimplementedMethodResponse);
 		}
 
 		// Run every middleware in sequence. If any fails, return error response
@@ -51,17 +58,20 @@ export const withNextRoute = (
 			const middlewareResponse = await middleware(controller, req, res);
 
 			if (middlewareResponse != null) {
-				return apiErrorResponse(req, res, middlewareResponse);
+				return apiErrorResponse(res, middlewareResponse);
 			}
 		}
 
 		const body = method == 'GET' ? query : req.body;
-		const result = await handler({ ...body, id: nextcontroller.at(1) });
-
-		res.status(200).json(result);
+		try {
+			const result = await handler({ ...body, id: nextcontroller.at(1) });
+			res.status(200).json(result);
+		} catch (_) {
+			return apiErrorResponse(res, badRequestResponse);
+		}
 	};
 };
 
-const apiErrorResponse = (req: NextApiRequest, res: NextApiResponse<APIErrorResponse>, msg: APIFullErrorResponse) => {
+const apiErrorResponse = (res: NextApiResponse<APIErrorResponse>, msg: APIFullErrorResponse) => {
 	res.status(msg.status).json({ error: msg.error });
 };

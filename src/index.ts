@@ -13,6 +13,7 @@ export interface CRUDBase extends DefaultCRUDBase {}
  * @param $protected Optional parameter to define if route is protected (must define own logic as middleware)
  * @param $parentUrl Optional parameter used by sub controllers
  */
+
 // Shared props between controller and sub controllers
 export interface DefaultSharedControllerProps {
 	$url: string;
@@ -21,6 +22,7 @@ export interface DefaultSharedControllerProps {
 }
 export interface DefaultControllerProps extends SharedControllerProps {
 	$base?: string;
+	$server?: string;
 }
 
 // Types made for augmentation
@@ -28,30 +30,37 @@ export interface SharedControllerProps extends DefaultSharedControllerProps {}
 export interface ControllerProps extends DefaultControllerProps {}
 
 // Methods
-export type BaseControllerMethods<T> = {
+export type BaseControllerMethods<T, ISARR = true> = {
+	index: () => Promise<ISARR extends true ? T[] : T>;
 	read: (data: CRUDBase) => Promise<T | Record<string, never>>;
 };
-export type ControllerMethods<T, C extends CRUDBase, U extends CRUDBase> = {
+export type ControllerMethods<T, C, U extends CRUDBase, ISARR = true> = {
 	create: (data: C) => Promise<T | Record<string, never>>;
-	index: () => Promise<T[]>;
 	update: (data: U) => Promise<T | Record<string, never>>;
 	destroy: (data: CRUDBase) => Promise<T | Record<string, never>>;
-} & BaseControllerMethods<T>;
+
+	$changeServer: (server: string) => never;
+	$clone: (template: TemplateReturn<T, C, U>) => never;
+} & BaseControllerMethods<T, ISARR>;
 
 // Main types
-export type Controller<T, C extends CRUDBase, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
-export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T> & SharedControllerProps;
+export type Controller<T, C, U extends CRUDBase> = ControllerMethods<T, C, U> & ControllerProps;
+export type SubController<T> = (c: ControllerProps) => BaseControllerMethods<T, false> & SharedControllerProps;
 
-type ControllerReturnType<T, C extends CRUDBase, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
+export type ControllerReturnType<T, C, U extends CRUDBase, SUB, MET> = Controller<T, C, U> & SUB & MET;
 type SubControllerReturnType<T> = ReturnType<SubController<T>> & ControllerProps;
+
+type IsEmpty<T> = [T] extends [never] | [''] ? true : false;
+
 /**
  * Create controller
  *
  * @param data {@link ControllerProps | Configuration object} for the controller
  * @returns Function to provide template
  */
-export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data: ControllerProps) => {
+export const createController = <T, C, U extends CRUDBase>(data: ControllerProps) => {
 	data.$base ??= 'custom';
+	data.$server ??= '';
 	data.$protected ??= true;
 
 	/**
@@ -66,31 +75,104 @@ export const createController = <T, C extends CRUDBase, U extends CRUDBase>(data
 
 	return <TEMPL extends TemplateReturn<T, C, U>>(template: TEMPL) => {
 		return <
-			G,
-			ST extends { [k: string]: SubController<unknown> },
-			KS extends keyof ST,
-			M extends { [k: string]: (t: ReturnType<TemplateReturn<T, C, U>>) => (data: never) => G },
-			KM extends keyof M
+			ST extends (t: ReturnType<typeof createTemplate>) => SubController<unknown>,
+			MT extends (t: ReturnType<TemplateReturn<T, C, U>>) => unknown,
+			KS extends keyof S,
+			M extends { [k: string]: MT },
+			// Disabling ban-types because Record<string, never> doesn't achieve same functionality as {} without writing more complex code
+			// eslint-disable-next-line @typescript-eslint/ban-types
+			S extends { [k: string]: ST } = {},
+			KM extends keyof M = ''
 		>(config?: {
-			subcontrollers?: ST;
+			subcontrollers?: S;
 			methods?: M;
 		}) => {
-			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: ReturnType<ST[k]> }>((p, c) => {
-				p[c] = config.subcontrollers[c](data);
-				return p;
-			}, {} as never);
+			// Default values
+			config ??= {};
+			config.subcontrollers ??= {} as never;
+			config.methods ??= {} as never;
+
+			const subs = Object.keys(config.subcontrollers).reduce<{ [k in KS]: SubControllerReturnType<unknown> }>(
+				(p, c) => {
+					p[c as KS] = config.subcontrollers[c](template as never)(data);
+					return p;
+				},
+				{} as never
+			);
 
 			const mets = Object.keys(config.methods).reduce<{ [k in KM]: ReturnType<M[k]> }>((p, c) => {
 				p[c] = config.methods[c](template(data));
 				return p;
 			}, {} as never);
 
+			// Function to change server for controller and subcontrollers
+			const $changeServer = (server: string) => {
+				data.$server = server;
+
+				// Change each subcontroller $server and update template methods
+				Object.keys(subs).forEach(k => {
+					subs[k as KS] = { ...config.subcontrollers[k](template as never)(data), $server: server };
+				});
+
+				// Change each method template
+				Object.keys(mets).forEach(k => {
+					mets[k as KM] = config.methods[k](template(data)) as never;
+				});
+
+				return {
+					...data,
+					...template(data),
+					...subs,
+					...mets,
+					$changeServer,
+					$clone,
+				} as unknown as ControllerReturnType<
+					T,
+					C,
+					U,
+					{ [k in KS]: ReturnType<ReturnType<S[k]>> },
+					IsEmpty<KM> extends true ? Record<string, never> : { [k in KM]: ReturnType<M[k]> }
+				>;
+			};
+
+			// Function to clone controller with new template
+			const $clone = (t: TEMPL) => {
+				template = t;
+
+				// Change each subcontroller template
+				Object.keys(subs).forEach(k => {
+					subs[k as KS] = { ...config.subcontrollers[k](t as never)(data) };
+				});
+				return {
+					...data,
+					...subs,
+					...mets,
+					...t(data),
+					$changeServer,
+					$clone,
+				} as unknown as ControllerReturnType<
+					T,
+					C,
+					U,
+					{ [k in KS]: ReturnType<ReturnType<S[k]>> },
+					IsEmpty<KM> extends true ? Record<string, never> : { [k in KM]: ReturnType<M[k]> }
+				>;
+			};
+
 			return {
 				...data,
 				...template(data),
 				...subs,
 				...mets,
-			} as ControllerReturnType<T, C, U, { [k in KS]: ReturnType<ST[k]> }, { [k in KM]: ReturnType<M[k]> }>;
+				$changeServer,
+				$clone,
+			} as unknown as ControllerReturnType<
+				T,
+				C,
+				U,
+				{ [k in KS]: ReturnType<ReturnType<S[k]>> },
+				IsEmpty<KM> extends true ? Record<string, never> : { [k in KM]: ReturnType<M[k]> }
+			>;
 		};
 	};
 };
@@ -117,13 +199,21 @@ export const createSubController = <T>(data: Omit<SharedControllerProps, '$paren
 		 */
 		return (c: ControllerProps) => {
 			const { $protected, $url: $parentUrl, $base } = c;
+			const { read, index } = template<T, unknown, CRUDBase, false>({
+				...c,
+				$base,
+				$protected,
+				$parentUrl,
+				...data,
+			});
 
 			return {
 				...c,
 				$parentUrl,
 				...data,
 
-				read: template<T, CRUDBase, CRUDBase>({ ...c, $base, $protected, $parentUrl, ...data }).read,
+				read,
+				index,
 			} as SubControllerReturnType<T>;
 		};
 	};

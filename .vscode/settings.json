@@ -1,6 +1,8 @@
 {
-    "typescript.tsdk": "node_modules\\typescript\\lib",
-    "githubPullRequests.ignoredPullRequestBranches": [
-        "canary"
-    ]
+	"typescript.tsdk": "node_modules\\typescript\\lib",
+	"githubPullRequests.ignoredPullRequestBranches": [
+		"canary"
+	],
+	"editor.detectIndentation": false,
+	"editor.tabSize": 4
 }
